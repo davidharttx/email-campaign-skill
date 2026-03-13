@@ -272,6 +272,124 @@ Build flows in this order for maximum revenue impact:
 
 ## Email Design System Rules
 
+### Reference HTML Template
+
+Use this as a structural starting point for every flow email. Adapt sections, colors, copy, and dynamic variables per flow and brand.
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ subject_line }}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <![endif]-->
+  <style>
+    body, table, td { font-family: 'Helvetica Neue', Arial, sans-serif; }
+    img { border: 0; display: block; max-width: 100%; }
+    a { color: #1A3D28; text-decoration: underline; }
+    @media only screen and (max-width: 620px) {
+      .container { width: 100% !important; padding: 0 16px !important; }
+      .hero-img { height: auto !important; }
+      .stack-col { display: block !important; width: 100% !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#FAF7F2;">
+  <!-- Preheader (hidden preview text) -->
+  <div style="display:none; max-height:0; overflow:hidden;">
+    {{ preview_text }}&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF7F2;">
+    <tr><td align="center" style="padding: 20px 0;">
+      <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF; border-radius:12px; overflow:hidden;">
+
+        <!-- HEADER: Logo + Optional Label -->
+        <tr><td style="padding:24px 32px; text-align:center;">
+          <img src="{{ brand_logo_url }}" alt="{{ brand_name }}" width="140" style="margin:0 auto;">
+        </td></tr>
+
+        <!-- HERO SECTION -->
+        <tr><td style="padding:0;">
+          <img src="{{ hero_image_url }}" alt="{{ hero_alt_text }}" width="600" class="hero-img" style="width:100%; display:block;">
+        </td></tr>
+
+        <!-- HEADLINE + BODY COPY -->
+        <tr><td style="padding:32px 32px 16px;">
+          <h1 style="margin:0; font-size:28px; line-height:1.3; color:#1A3D28; font-weight:700;">
+            {{ headline }}
+          </h1>
+        </td></tr>
+        <tr><td style="padding:0 32px 24px;">
+          <p style="margin:0; font-size:16px; line-height:1.6; color:#4A4A4A;">
+            {{ body_copy }}
+          </p>
+        </td></tr>
+
+        <!-- PRIMARY CTA BUTTON -->
+        <tr><td style="padding:0 32px 32px;">
+          <table role="presentation" cellpadding="0" cellspacing="0">
+            <tr><td style="background-color:#1A3D28; border-radius:8px;">
+              <a href="{{ cta_url }}" style="display:inline-block; padding:16px 40px; color:#FFFFFF; font-size:16px; font-weight:700; text-decoration:none; text-align:center;">
+                {{ cta_text }}
+              </a>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- TRUST BAR (3 signals) -->
+        <tr><td style="padding:0 32px 24px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td class="stack-col" width="33%" style="text-align:center; padding:12px 8px; font-size:12px; color:#666;">
+                {{ trust_signal_1 }}
+              </td>
+              <td class="stack-col" width="33%" style="text-align:center; padding:12px 8px; font-size:12px; color:#666;">
+                {{ trust_signal_2 }}
+              </td>
+              <td class="stack-col" width="33%" style="text-align:center; padding:12px 8px; font-size:12px; color:#666;">
+                {{ trust_signal_3 }}
+              </td>
+            </tr>
+          </table>
+        </td></tr>
+
+        <!-- FOOTER -->
+        <tr><td style="padding:24px 32px; background-color:#F5F5F5; text-align:center;">
+          <p style="margin:0 0 8px; font-size:14px; font-weight:600; color:#1A3D28;">{{ brand_name }}</p>
+          <p style="margin:0 0 16px; font-size:12px; color:#999;">
+            <a href="{{ shop_url }}" style="color:#999;">Shop</a> &nbsp;|&nbsp;
+            <a href="{{ about_url }}" style="color:#999;">Our Story</a> &nbsp;|&nbsp;
+            <a href="{{ support_url }}" style="color:#999;">Support</a>
+          </p>
+          <p style="margin:0 0 8px; font-size:11px; color:#BBB; line-height:1.5;">
+            {{ compliance_disclaimer }}
+          </p>
+          <p style="margin:0; font-size:11px; color:#BBB;">
+            <a href="{{ unsubscribe_url }}" style="color:#BBB;">Unsubscribe</a> &nbsp;|&nbsp;
+            <a href="{{ manage_preferences_url }}" style="color:#BBB;">Manage Preferences</a>
+          </p>
+          <p style="margin:8px 0 0; font-size:11px; color:#CCC;">&copy; {{ current_year }} {{ brand_name }}. All rights reserved.</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+```
+
+**Adapt this template by:**
+- Replacing placeholder variables (`{{ headline }}`, `{{ body_copy }}`, etc.) with actual content or Klaviyo dynamic variables
+- Adding/removing sections (product grids, review blocks, ingredient callouts) as needed
+- Changing the color palette to match the brand (replace `#1A3D28`, `#FAF7F2`, etc.)
+- Adding Outlook-specific table fixes inside `<!--[if mso]>` blocks as needed
+
+---
+
 ### HTML Email Standards
 
 Every email must follow these technical standards:
@@ -405,24 +523,26 @@ Enable Smart Sending (16-hour window) on all flow emails to prevent overlap with
 - Modify flow triggers or filters
 
 **Deployment workflow:**
-1. Create templates via API with proper naming (`DH | Flow Name #N -- Email Name`)
+1. Create templates via API with proper naming (`[PREFIX] | Flow Name #N -- Email Name`)
 2. Build flow structure in Klaviyo UI (triggers, delays, email actions)
 3. Assign templates to flow email actions in the UI
 4. OR paste HTML directly into the flow email code editor
 
 ### Template Naming Convention
 
+Replace `[PREFIX]` with your brand or agency initials (e.g., "GR" for GlowRoot, "RC" for RoastCraft).
+
 ```
-DH | [Flow Name] [#] -- [Email Name]
+[PREFIX] | [Flow Name] [#] -- [Email Name]
 ```
 
-Examples:
+Examples (using "GR" as prefix):
 ```
-DH | Welcome 1 -- Your 15% Off
-DH | Welcome 2 -- Brand Story
-DH | Nurture 3 -- Product Spotlight
-DH | Browse Abandonment 1 -- Still Looking
-DH | Cart Abandonment 2 -- Social Proof
+GR | Welcome 1 -- Your 15% Off
+GR | Welcome 2 -- Brand Story
+GR | Nurture 3 -- Product Spotlight
+GR | Browse Abandonment 1 -- Still Looking
+GR | Cart Abandonment 2 -- Social Proof
 ```
 
 ---
@@ -451,7 +571,7 @@ DH | Cart Abandonment 2 -- Social Proof
 
 ### 1. Flow Summary
 ```
-**Flow Name:** DH | [Flow Name]
+**Flow Name:** [PREFIX] | [Flow Name]
 **Trigger:** [Trigger event]
 **Scope:** [Per-list | Universal]
 **Emails:** [Count]
@@ -486,5 +606,5 @@ DH | Cart Abandonment 2 -- Social Proof
 ```
 | Template Name | File | Klaviyo ID |
 |---|---|---|
-| DH | Flow Name 1 -- Email Name | filename.html | [after upload] |
+| [PREFIX] | Flow Name 1 -- Email Name | filename.html | [after upload] |
 ```

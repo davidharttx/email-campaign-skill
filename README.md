@@ -12,7 +12,7 @@ Built for email marketers, e-commerce operators, and agencies managing Klaviyo a
 
 ## Table of Contents
 
-- [What This Repo Contains](#what-this-repo-contains)
+- [What This Skill Does](#what-this-skill-does)
 - [Architecture](#architecture)
 - [Installation](#installation)
 - [Skill 1: Campaign Calendar](#skill-1-campaign-calendar)
@@ -107,7 +107,7 @@ email-campaign-skill/
 
 1. Clone this repo:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/email-campaign-skill.git
+   git clone https://github.com/davidharttx/email-campaign-skill.git
    ```
 
 2. Copy the skill directory into your Claude Code skills folder:
@@ -137,9 +137,35 @@ cp scripts/campaign_ideator.jsx src/components/CampaignIdeator.jsx
 **Requirements for the React component:**
 - React 18+
 - Tailwind CSS (for styling classes)
-- An Anthropic API key (the component calls the Claude API directly)
+- A backend proxy endpoint that forwards requests to the Anthropic API
 
-**Note:** The React component makes direct API calls to `https://api.anthropic.com/v1/messages`. You'll need to handle API key management in your application (via a backend proxy or environment variable). Never expose API keys in client-side code in production.
+**Backend Proxy Setup (required):**
+
+The component sends requests to `/api/generate` by default (or `VITE_API_PROXY_URL` env var). You need a backend endpoint that adds your API key and forwards to Anthropic. Never expose API keys in client-side code.
+
+Example Express proxy:
+```js
+// server.js
+import express from "express";
+const app = express();
+app.use(express.json());
+
+app.post("/api/generate", async (req, res) => {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify(req.body),
+  });
+  const data = await response.json();
+  res.json(data);
+});
+
+app.listen(3001);
+```
 
 ---
 

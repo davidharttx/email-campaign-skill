@@ -1,5 +1,25 @@
 import { useState } from "react";
 
+/**
+ * Campaign Calendar Builder — React UI Component
+ *
+ * SETUP: This component requires a backend proxy to call the Anthropic API.
+ * Direct browser-to-API calls will fail due to CORS restrictions.
+ *
+ * Option A: Set the VITE_API_PROXY_URL env var to your proxy endpoint
+ *   e.g. VITE_API_PROXY_URL=http://localhost:3001/api/generate
+ *
+ * Option B: Use the default /api/generate endpoint (works with Next.js API routes,
+ *   Express middleware, or any backend that forwards to api.anthropic.com/v1/messages)
+ *
+ * Your proxy should accept the same JSON body and forward it to Anthropic with
+ * your API key in the x-anthropic-api-key header. See README for examples.
+ */
+
+const API_ENDPOINT = typeof import.meta !== "undefined" && import.meta.env?.VITE_API_PROXY_URL
+  ? import.meta.env.VITE_API_PROXY_URL
+  : "/api/generate";
+
 const PILLARS = ["Educational", "Social Proof", "Community/Branded", "Product/Collection", "Sales"];
 const PILLAR_COLORS = {
   "Educational": "bg-blue-100 text-blue-800 border-blue-200",
@@ -92,10 +112,14 @@ export default function CampaignIdeator() {
     setError("");
     setStep("loading");
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
+
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch(API_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 4000,
@@ -106,6 +130,11 @@ export default function CampaignIdeator() {
         }),
       });
 
+      if (!response.ok) {
+        const errBody = await response.text().catch(() => "");
+        throw new Error(`API returned ${response.status}: ${errBody.slice(0, 200)}`);
+      }
+
       const data = await response.json();
       const raw = data.content?.find(b => b.type === "text")?.text || "";
       const clean = raw.replace(/```json|```/g, "").trim();
@@ -114,8 +143,11 @@ export default function CampaignIdeator() {
       setCampaigns(parsed.campaigns || []);
       setStep("results");
     } catch (e) {
-      setError("Generation failed. Please try again. " + e.message);
+      const msg = e.name === "AbortError" ? "Request timed out after 2 minutes." : e.message;
+      setError("Generation failed: " + msg);
       setStep("form");
+    } finally {
+      clearTimeout(timeout);
     }
   };
 
@@ -354,7 +386,7 @@ export default function CampaignIdeator() {
                           <span className="text-xs text-gray-500">{c.day}</span>
                         </div>
                         <p className="font-semibold text-white mt-1 truncate">{c.name}</p>
-                        <p className="text-sm text-gray-400 truncate">✉ {c.subject}</p>
+                        <p className="text-sm text-gray-400 truncate">{c.subject}</p>
                       </div>
                       <svg
                         className={`w-4 h-4 text-gray-500 shrink-0 transition-transform ${expandedId === c.id ? "rotate-180" : ""}`}
