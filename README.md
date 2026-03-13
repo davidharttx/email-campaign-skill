@@ -83,6 +83,8 @@ email-campaign-skill/
 |   |-- example-calendar.md             # Sample campaign calendar output
 |   |-- flows/
 |       |-- example-browse-abandonment.md # Sample browse abandonment flow
+|       |-- example-cart-abandonment.md  # Sample cart abandonment flow
+|       |-- example-welcome-flow.md      # Sample welcome flow
 |-- README.md                           # This file
 |-- LICENSE                             # MIT License
 |-- .gitignore
